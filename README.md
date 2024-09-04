@@ -517,3 +517,52 @@ plt.show()
 ```
 
 ![entregas_distrito_federal.png](content/Projeto_Loggi/base)
+
+```python
+# Plotando gráfico de barras para mostrar a proporção de entregas por região
+plt.figure(figsize=(10, 6))
+with sns.axes_style('whitegrid'):
+  grafico = sns.barplot(data=data, x="region", y="proportion", ci=None, palette="pastel")
+  grafico.set(title='Proporção de entregas por região', xlabel='Região', ylabel='Proporção')
+
+# Salvando a imagem em PNG no diretório especificado
+plt.savefig("/content/Projeto_Loggi/base/proporcao_entregas_por_regiao.png.png", format="png", dpi=300, bbox_inches="tight")
+
+plt.show()
+```
+
+![proporcao_entregas_por_regiao.png](content/Projeto_Loggi/base)
+
+```python
+plt.figure(figsize=(10, 6))
+sns.countplot(data=deliveries_df, x='region', palette='pastel', order=['df-1', 'df-2', 'df-0'])
+plt.title('Distribuição de Entregas por Região')
+plt.xlabel('Região')
+plt.ylabel('Contagem de Entregas')
+
+# Salvando a imagem em PNG no diretório especificado
+plt.savefig("/content/Projeto_Loggi/base/contagem_entregas_por_regiao..png", format="png", dpi=300, bbox_inches="tight")
+plt.show()
+```
+
+![contagem_entregas_por_regiao..png](content/Projeto_Loggi/base)
+
+## **8\. Insights Gerados**
+
+
+*   As entregas estão devidamente alocadas aos seus respectivos HUBs, mas os HUBs das regiões DF-0 e DF-2 realizam entregas em locais mais distantes do centro e entre si, o que pode aumentar o tempo e o custo de entrega. Observamos também que há Regiões Administrativas com baixa cobertura de atuação dos HUBs. O HUB DF-1, por outro lado, opera em uma área mais concentrada, o que sugere que os HUBs DF-0 e DF-2 enfrentam custos operacionais potencialmente mais elevados, especialmente em termos de consumo de combustível.
+
+*   A distribuição das entregas está fortemente concentrada nos HUBs das regiões DF-1 e DF-2, enquanto o HUB da região DF-0 tem uma participação significativamente menor. No entanto, como a capacidade dos veículos é a mesma para todos os HUBs, seria possível realocar veículos para as regiões com maior demanda de entregas. Observamos que o HUB DF-0 possui uma baixa taxa de atuação, sugerindo que há oportunidades para expandir sua presença nas Regiões Administrativas, especialmente considerando a densidade urbana dessas áreas.
+
+### 8.1 Próximas Etapas:
+
+
+*   Investigar o impacto da redistribuição de entregas entre os HUBs na eficiência operacional.
+
+*   Utilizar modelos de otimização para simular diferentes cenários de alocação de recursos.
+
+*   Explorar estratégias de aumento da capacidade de entrega nos HUBs menos utilizados.
+
+## **9\. Conclusão**
+
+Este estudo utiliza análise exploratória de dados e *storytelling* para otimizar operações logísticas, analisando a redistribuição de entregas entre HUBs e seu impacto na eficiência e nos custos operacionais. Observa-se que os HUBs das regiões DF-0 e DF-2 enfrentam maiores custos devido à distância entre os pontos de entrega, enquanto o HUB DF-1 opera de forma mais centralizada, com menores custos. A concentração de entregas nos HUBs DF-1 e DF-2 indica a necessidade de uma realocação estratégica de recursos e a expansão do HUB DF-0 para melhorar a cobertura e eficiência em áreas menos atendidas.
