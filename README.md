@@ -110,7 +110,7 @@ deliveries_df = pd.DataFrame(data)
 
 # Exibindo o DataFrame
 deliveries_df.head()
-{df_markdown}
+{df_markdown1}
 ```
 
 ## **4\. Exploração de Dados**
