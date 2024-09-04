@@ -513,10 +513,11 @@ for handle in lgnd.legendHandles:
 # Salvando a imagem em PNG no diretório especificado
 plt.savefig("/content/Projeto_Loggi/base/entregas_distrito_federal.png", format="png", dpi=300, bbox_inches="tight")
 
+
 plt.show()
 ```
 
-![entregas_distrito_federal.png](content/Projeto_Loggi/base)
+![Entregas no Distrito Federal](https://raw.githubusercontent.com/GabrielCoca/Projeto_Loggi/main/base/entregas_distrito_federal.png)
 
 ```python
 # Plotando gráfico de barras para mostrar a proporção de entregas por região
@@ -526,12 +527,13 @@ with sns.axes_style('whitegrid'):
   grafico.set(title='Proporção de entregas por região', xlabel='Região', ylabel='Proporção')
 
 # Salvando a imagem em PNG no diretório especificado
-plt.savefig("/content/Projeto_Loggi/base/proporcao_entregas_por_regiao.png.png", format="png", dpi=300, bbox_inches="tight")
+plt.savefig("/content/Projeto_Loggi/base/proporcao_entregas_por_regiao.png.", format="png", dpi=300, bbox_inches="tight")
 
 plt.show()
 ```
 
-![proporcao_entregas_por_regiao.png](content/Projeto_Loggi/base)
+![Proporção de Entregas por Região](https://raw.githubusercontent.com/GabrielCoca/Projeto_Loggi/main/base/proporcao_entregas_por_regiao.png)
+
 
 ```python
 plt.figure(figsize=(10, 6))
@@ -541,11 +543,12 @@ plt.xlabel('Região')
 plt.ylabel('Contagem de Entregas')
 
 # Salvando a imagem em PNG no diretório especificado
-plt.savefig("/content/Projeto_Loggi/base/contagem_entregas_por_regiao..png", format="png", dpi=300, bbox_inches="tight")
+plt.savefig("/content/Projeto_Loggi/base/contagem_entregas_por_regiao.png", format="png", dpi=300, bbox_inches="tight")
 plt.show()
 ```
 
-![contagem de entregas por regiao DR](base/contagem_entregas_por_regiao.png)
+![Contagem de Entregas por Região](https://raw.githubusercontent.com/GabrielCoca/Projeto_Loggi/main/base/contagem_entregas_por_regiao.png)
+
 
 ## **8\. Insights Gerados**
 
