@@ -98,6 +98,7 @@ os.environ["GITHUB_TOKEN"] = usertoken
 
 %cd /content/Projeto_Loggi
 ```
+
 Os dados no formato JSON e serão convertidos para um DataFrame, facilitando a manipulação durante a análise.
 
 ```python
@@ -110,3 +111,15 @@ deliveries_df = pd.DataFrame(data)
 
 # Exibindo o DataFrame
 deliveries_df.head()
+```
+
+```python
+name	region	origin	vehicle_capacity	deliveries
+0	cvrp-2-df-33	df-2	{'lng': -48.05498915846707, 'lat': -15.8381445...	180	[{'id': '313483a19d2f8d65cd5024c8d215cfbd', 'p...
+1	cvrp-2-df-73	df-2	{'lng': -48.05498915846707, 'lat': -15.8381445...	180	[{'id': 'bf3fc630b1c29601a4caf1bdd474b85', 'po...
+2	cvrp-2-df-20	df-2	{'lng': -48.05498915846707, 'lat': -15.8381445...	180	[{'id': 'b30f1145a2ba4e0b9ac0162b68d045c3', 'p...
+3	cvrp-1-df-71	df-1	{'lng': -47.89366206897872, 'lat': -15.8051175...	180	[{'id': 'be3ed547394196c12c7c27c89ac74ed6', 'p...
+4	cvrp-2-df-87	df-2	{'lng': -48.05498915846707, 'lat': -15.8381445...	180	[{'id': 'a6328fb4dc0654eb28a996a270b0f6e4', 'p...
+```
+
+## **4\. Exploração de Dados**
