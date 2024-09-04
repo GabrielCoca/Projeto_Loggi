@@ -230,15 +230,15 @@ deliveries_df.info()
 <class 'pandas.core.frame.DataFrame'>
 RangeIndex: 636149 entries, 0 to 636148
 Data columns (total 9 columns):
- #   Column            Non-Null Count   Dtype  
----  ------            --------------   -----  
- 0   name              636149 non-null  object 
- 1   region            636149 non-null  object 
+ #   Column            Non-Null Count   Dtype
+---  ------            --------------   -----
+ 0   name              636149 non-null  object
+ 1   region            636149 non-null  object
  2   hub_lng           636149 non-null  float64
  3   hub_lat           636149 non-null  float64
- 4   vehicle_capacity  636149 non-null  int64  
- 5   delivery_size     636149 non-null  int64  
- 6   delivery_id       636149 non-null  object 
+ 4   vehicle_capacity  636149 non-null  int64
+ 5   delivery_size     636149 non-null  int64
+ 6   delivery_id       636149 non-null  object
  7   delivery_lng      636149 non-null  float64
  8   delivery_lat      636149 non-null  float64
 dtypes: float64(4), int64(2), object(3)
@@ -470,7 +470,7 @@ geo_hub_df.head()
 2	df-0	-47.802665	-15.657014	POINT (-47.80266 -15.65701)
 ```
 
-```python	
+```python
 # Criação de GeoDataFrames para as entregas
 geo_deliveries_df = gpd.GeoDataFrame(deliveries_df, geometry=gpd.points_from_xy(deliveries_df["delivery_lng"], deliveries_df["delivery_lat"]))
 geo_deliveries_df.head()
@@ -545,7 +545,7 @@ plt.savefig("/content/Projeto_Loggi/base/contagem_entregas_por_regiao..png", for
 plt.show()
 ```
 
-![contagem_entregas_por_regiao..png](content/Projeto_Loggi/base)
+![contagem de entregas por regiao DR](base/contagem_entregas_por_regiao.png)
 
 ## **8\. Insights Gerados**
 
