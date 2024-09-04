@@ -208,7 +208,156 @@ name	region	hub_lng	hub_lat	vehicle_capacity	delivery_size	delivery_id	delivery_
 4	cvrp-2-df-33	df-2	-48.054989	-15.838145	180	7	54cb45b7bbbd4e34e7150900f92d7f4b	-48.114898	-15.858055
 ```
 
+## **5\. Análise Exploratória**
 
+Agora, com o Dataframe estruturado, partiremos para uma analise exploratória.
+
+```python
+# Dimensões do DataFrame
+deliveries_df.shape
+```
+
+```python
+(636149, 9)
+```
+
+```python
+# Tipo de dado do DataFrame
+deliveries_df.info()
+```
+
+```python
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 636149 entries, 0 to 636148
+Data columns (total 9 columns):
+ #   Column            Non-Null Count   Dtype  
+---  ------            --------------   -----  
+ 0   name              636149 non-null  object 
+ 1   region            636149 non-null  object 
+ 2   hub_lng           636149 non-null  float64
+ 3   hub_lat           636149 non-null  float64
+ 4   vehicle_capacity  636149 non-null  int64  
+ 5   delivery_size     636149 non-null  int64  
+ 6   delivery_id       636149 non-null  object 
+ 7   delivery_lng      636149 non-null  float64
+ 8   delivery_lat      636149 non-null  float64
+dtypes: float64(4), int64(2), object(3)
+memory usage: 43.7+ MB
+```
+
+```python
+# Identificando valores nulos
+deliveries_df.isna().sum()
+```
+
+```python
+name                  0
+region                0
+hub_lng               0
+hub_lat               0
+vehicle_capacity      0
+delivery_size         0
+delivery_id           0
+delivery_lng          0
+delivery_lat          0
+dtype: int64
+```
+
+```python
+# Contando valores distindo nas colunas
+deliveries_df.nunique()
+```
+
+```python
+
+0
+name	199
+region	3
+hub_lng	3
+hub_lat	3
+vehicle_capacity	1
+delivery_size	10
+delivery_id	291566
+delivery_lng	291566
+delivery_lat	291566
+dtype: int64
+```
+
+```python
+# Separando os dados numéricos dos dados categóricos
+var_numericos = []
+var_categoricas = []
+
+for coluna in deliveries_df.columns:
+  if deliveries_df[coluna].dtype != "object":
+    var_numericos.append(coluna)
+  else:
+    var_categoricas.append(coluna)
+
+print(f'As colunas numéricas são: {var_numericos}')
+print(f'As colunas categóricas são: {var_categoricas}')
+```
+
+```python
+As colunas numéricas são: ['hub_lng', 'hub_lat', 'vehicle_capacity', 'delivery_size', 'delivery_lng', 'delivery_lat']
+As colunas categóricas são: ['name', 'region', 'delivery_id']
+
+```python
+# Resumo statístico
+deliveries_df[var_numericos].describe().round(2)
+```
+
+```python
+	hub_lng	hub_lat	vehicle_capacity	delivery_size	delivery_lng	delivery_lat
+count	636149.00	636149.00	636149.0	636149.00	636149.00	636149.00
+mean	-47.95	-15.80	180.0	5.51	-47.95	-15.81
+std	0.09	0.05	0.0	2.87	0.11	0.08
+min	-48.05	-15.84	180.0	1.00	-48.28	-16.05
+25%	-48.05	-15.84	180.0	3.00	-48.04	-15.84
+50%	-47.89	-15.81	180.0	6.00	-47.93	-15.81
+75%	-47.89	-15.81	180.0	8.00	-47.88	-15.77
+max	-47.80	-15.66	180.0	10.00	-47.31	-15.50
+```
+
+- **Nota:**
+
+Na coluna vehicle_capacity, todos os valores são iguais a 180, indicando que a capacidade dos veículos é uniforme. Já a coluna delivery_size apresenta uma variação moderada, com média de 5,51 e mediana de 6.
+
+```python
+# Resumo estatistico
+deliveries_df[var_categoricas].describe().round(2)
+```
+
+```python
+	name	region	delivery_id
+count	636149	636149	636149
+unique	199	3	291566
+top	cvrp-1-df-87	df-1	61b87669243974d021c2b76fc5272045
+freq	5636	304708	12
+```
+
+- **Nota:**
+
+O Distrito Federal contém três HUBs, sendo o HUB df-1 o que possui o maior número de entregas.
+
+```python
+# Análise de proporção de entregas por região
+data = pd.DataFrame(deliveries_df[['region', 'vehicle_capacity']].value_counts(normalize=True)).reset_index()
+data.rename(columns={0: "proportion"}, inplace=True)
+data["proportion"] = (data["proportion"] * 100).round(2)
+data.head()
+```
+
+```python
+	region	vehicle_capacity	proportion
+0	df-1	180	47.90
+1	df-2	180	41.08
+2	df-0	180	11.02
+```
+
+- **Nota:**
+
+Os HUBs um e dois concentram mais de 80% das entregas no Distrito Federal. Esse dado sugere que aumentar a participação do HUB zero pode melhorar a distribuição de entregas entre os três HUBs.
 
 
 
