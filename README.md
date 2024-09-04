@@ -76,7 +76,7 @@ import json
 import matplotlib.pyplot as plt
 import seaborn as sns
 ```
-## **3\. Carregamento dos Dados\**
+## **3\. Carregamento dos Dados**
 
 Os dados utilizados neste projeto estão disponíveis em um arquivo JSON armazenado no repositório GitHub. Abaixo, o código para clonagem do repositório e carregamento dos dados:
 
