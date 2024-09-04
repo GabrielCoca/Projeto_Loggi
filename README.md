@@ -359,5 +359,161 @@ data.head()
 
 Os HUBs um e dois concentram mais de 80% das entregas no Distrito Federal. Esse dado sugere que aumentar a participação do HUB zero pode melhorar a distribuição de entregas entre os três HUBs.
 
+A **geocodificação** é o processo de converter uma descrição textual de um local (como um endereço ou nome de um lugar) em suas coordenadas geográficas correspondentes (latitude e longitude). Já a **geocodificação reversa** faz o inverso: transforma uma coordenada geográfica em sua descrição textual correspondente.
 
+```python
+# Inicializando o geolocalizador
+geolocator = Nominatim(user_agent="Projeto_Loggi_Geocoder")
+geocoder = RateLimiter(geolocator.reverse, min_delay_seconds=1)
+```
 
+Normalização e tratamento de campos multivalorados:
+
+```python
+# Criando um DataFrame apenas com as coordenadas dos hubs
+hub_df = deliveries_df[["region", "hub_lng", "hub_lat"]]
+hub_df = hub_df.drop_duplicates().sort_values(by="region").reset_index(drop=True)
+hub_df["coordinates"] = hub_df["hub_lat"].astype(str)  + ", " + hub_df["hub_lng"].astype(str)
+
+# Aplicando o geocoder para obter informações geográficas detalhadas
+hub_df["geodata"] = hub_df["coordinates"].apply(geocoder)
+
+# Normalizando e organizando os dados geográficos dos hubs
+hub_geodata_df = pd.json_normalize(hub_df["geodata"].apply(lambda data: data.raw))
+
+# Selecionamos apenas as colunas relevantes (cidade, subúrbio, e cidade principal)
+hub_geodata_df = hub_geodata_df[["address.town", "address.suburb", "address.city"]]
+hub_geodata_df.rename(columns={"address.town": "hub_town", "address.suburb": "hub_suburb", "address.city": "hub_city"}, inplace=True)
+hub_geodata_df["hub_city"] = np.where(hub_geodata_df["hub_city"].notna(), hub_geodata_df["hub_city"], hub_geodata_df["hub_town"])
+hub_geodata_df["hub_suburb"] = np.where(hub_geodata_df["hub_suburb"].notna(), hub_geodata_df["hub_suburb"], hub_geodata_df["hub_city"])
+hub_geodata_df = hub_geodata_df.drop("hub_town", axis=1)
+
+# Visualização após consolidação principal
+hub_geodata_df.head()
+```
+
+```python
+	hub_suburb	hub_city
+0	Sobradinho	Sobradinho
+1	Asa Sul	Brasília
+2	Taguatinga	Taguatinga
+```
+
+```python
+# Mesclando informações geográficas detalhadas dos hubs com o DataFrame principal
+hub_df = pd.merge(left=hub_df, right=hub_geodata_df, left_index=True, right_index=True)
+hub_df = hub_df[["region", "hub_suburb", "hub_city"]]
+deliveries_df = pd.merge(left=deliveries_df, right=hub_df, how="inner", on="region")
+deliveries_df = deliveries_df[["name", "region", "hub_lng", "hub_lat", "hub_city", "hub_suburb", "vehicle_capacity", "delivery_size", "delivery_id", "delivery_lng", "delivery_lat"]]
+deliveries_df.head()
+```
+
+```python
+
+name	region	hub_lng	hub_lat	hub_city	hub_suburb	vehicle_capacity	delivery_size	delivery_id	delivery_lng	delivery_lat
+0	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	9	313483a19d2f8d65cd5024c8d215cfbd	-48.116189	-15.848929
+1	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	320c94b17aa685c939b3f3244c3099de	-48.118195	-15.850772
+2	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	1	3663b42f4b8decb33059febaba46d5c8	-48.112483	-15.847871
+3	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	e11ab58363c38d6abc90d5fba87b7d7	-48.118023	-15.846471
+4	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	7	54cb45b7bbbd4e34e7150900f92d7f4b	-48.114898	-15.858055
+```
+
+```python
+# Carregando dados de geolocalização adicionais de entregas de um arquivo CSV
+deliveries_geodata_df = pd.read_csv("base/deliveries-geodata.csv")
+
+# Mesclando os dados de geolocalização das entregas com o DataFrame principal
+deliveries_df = pd.merge(left=deliveries_df, right=deliveries_geodata_df[["delivery_city", "delivery_suburb"]], how="inner", left_index=True, right_index=True)
+deliveries_df.head()
+```
+
+```python
+name	region	hub_lng	hub_lat	hub_city	hub_suburb	vehicle_capacity	delivery_size	delivery_id	delivery_lng	delivery_lat	delivery_city	delivery_suburb
+0	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	9	313483a19d2f8d65cd5024c8d215cfbd	-48.116189	-15.848929	Ceilândia	P Sul
+1	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	320c94b17aa685c939b3f3244c3099de	-48.118195	-15.850772	Ceilândia	P Sul
+2	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	1	3663b42f4b8decb33059febaba46d5c8	-48.112483	-15.847871	Ceilândia	P Sul
+3	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	e11ab58363c38d6abc90d5fba87b7d7	-48.118023	-15.846471	Ceilândia	P Sul
+4	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	7	54cb45b7bbbd4e34e7150900f92d7f4b	-48.114898	-15.858055	Sol Nascente/Pôr do Sol	Sol Nascente/Pôr do Sol
+```
+
+```python
+# Download dos dados geográficos do Distrito Federal
+!wget -q "https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc100/go_df/versao2016/shapefile/bc100_go_df_shp.zip" -O distrito-federal.zip
+!unzip -q distrito-federal.zip -d ./maps
+!cp ./maps/LIM_Unidade_Federacao_A.shp ./distrito-federal.shp
+!cp ./maps/LIM_Unidade_Federacao_A.shx ./distrito-federal.shx
+
+# Leitura e visualização do mapa do Distrito Federal
+mapa = gpd.read_file("distrito-federal.shp")
+mapa = mapa.loc[[0]]
+mapa.head()
+```
+
+```python
+geometry
+0	POLYGON Z ((-47.31048 -16.03602 0.00000, -47.3...
+```
+
+Este código prepara um conjunto de dados de HUBs de distribuição, eliminando duplicações e convertendo-o em um formato geoespacial (GeoDataFrame). Isso permite realizar análises geoespaciais, como visualização de mapas ou cálculos de distâncias entre os pontos de entrega.
+
+```python
+# Criação de GeoDataFrames para os hubs
+hub_df = deliveries_df[["region", "hub_lng", "hub_lat"]].drop_duplicates().reset_index(drop=True)
+geo_hub_df = gpd.GeoDataFrame(hub_df, geometry=gpd.points_from_xy(hub_df["hub_lng"], hub_df["hub_lat"]))
+geo_hub_df.head()
+```
+
+```python
+	region	hub_lng	hub_lat	geometry
+0	df-2	-48.054989	-15.838145	POINT (-48.05499 -15.83814)
+1	df-1	-47.893662	-15.805118	POINT (-47.89366 -15.80512)
+2	df-0	-47.802665	-15.657014	POINT (-47.80266 -15.65701)
+```
+
+```python	
+# Criação de GeoDataFrames para as entregas
+geo_deliveries_df = gpd.GeoDataFrame(deliveries_df, geometry=gpd.points_from_xy(deliveries_df["delivery_lng"], deliveries_df["delivery_lat"]))
+geo_deliveries_df.head()
+```
+
+```python
+name	region	hub_lng	hub_lat	hub_city	hub_suburb	vehicle_capacity	delivery_size	delivery_id	delivery_lng	delivery_lat	delivery_city	delivery_suburb	geometry
+0	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	9	313483a19d2f8d65cd5024c8d215cfbd	-48.116189	-15.848929	Ceilândia	P Sul	POINT (-48.11619 -15.84893)
+1	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	320c94b17aa685c939b3f3244c3099de	-48.118195	-15.850772	Ceilândia	P Sul	POINT (-48.11819 -15.85077)
+2	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	1	3663b42f4b8decb33059febaba46d5c8	-48.112483	-15.847871	Ceilândia	P Sul	POINT (-48.11248 -15.84787)
+3	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	2	e11ab58363c38d6abc90d5fba87b7d7	-48.118023	-15.846471	Ceilândia	P Sul	POINT (-48.11802 -15.84647)
+4	cvrp-2-df-33	df-2	-48.054989	-15.838145	Taguatinga	Taguatinga	180	7	54cb45b7bbbd4e34e7150900f92d7f4b	-48.114898	-15.858055	Sol Nascente/Pôr do Sol	Sol Nascente/Pôr do Sol	POINT (-48.11490 -15.85805)
+```
+
+## **7\. Visualizações**
+
+Visualizações gráficas para ilustrar insights importantes:
+
+```python
+# criando o plot vazio
+fig, ax = plt.subplots(figsize = (50/2.54, 50/2.54))
+
+# plot mapa do distrito federal
+mapa.plot(ax=ax, alpha=0.4, color="lightgrey")
+
+# plot das entregas
+geo_deliveries_df.query("region == 'df-0'").plot(ax=ax, markersize=1, color="seagreen", label="df-0")
+geo_deliveries_df.query("region == 'df-1'").plot(ax=ax, markersize=1, color="blue", label="df-1")
+geo_deliveries_df.query("region == 'df-2'").plot(ax=ax, markersize=1, color="red", label="df-2")
+
+# plot dos hubs
+geo_hub_df.plot(ax=ax, markersize=30, marker="x", color="black", label="hub")
+
+# plot da legenda
+plt.title("Entregas no Distrito Federal por Região", fontdict={"fontsize": 16})
+lgnd = plt.legend(prop={"size": 15})
+for handle in lgnd.legendHandles:
+    handle.set_sizes([50])
+
+# Salvando a imagem em PNG no diretório especificado
+plt.savefig("/content/Projeto_Loggi/base/entregas_distrito_federal.png", format="png", dpi=300, bbox_inches="tight")
+
+plt.show()
+```
+
+![entregas_distrito_federal.png](content/Projeto_Loggi/base)
